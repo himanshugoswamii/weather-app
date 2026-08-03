@@ -13,6 +13,14 @@ class WeatherViewModel: ObservableObject {
     @Published var temperature: Double?
     @Published var windspeed: Double?
     @Published var errorMessage: String?
+    
+    var onUpdate: (() -> Void)?
+
+    func setupCallback() {
+        onUpdate = { [weak self] in
+            print("Temperature updated: \(self?.temperature ?? 0)")
+        }
+    }
 
     func loadWeather(for city: String) async {
         guard let geocodingURL = URL(string: "https://geocoding-api.open-meteo.com/v1/search?name=\(city)&count=1") else {
