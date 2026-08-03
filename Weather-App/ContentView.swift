@@ -28,7 +28,7 @@ struct WeatherView: View {
                     Text("\(formatedwind) km/h")
                 }
             } else {
-                Text("Loading...")
+                ProgressView()
             }
         }
         .task {
