@@ -24,7 +24,7 @@ struct WeatherView: View {
                 VStack {
                     let formatedtemp=String(format:"%.1f",temp)
                     let formatedwind=String(format: "%.1f",wind)
-                    Text("\(formatedtemp)°C")
+                    Text("\(formatedtemp) °C")
                     Text("\(formatedwind) km/h")
                 }
             } else {
