@@ -13,6 +13,7 @@ class WeatherViewModel: ObservableObject {
     @Published var temperature: Double?
     @Published var windspeed: Double?
     @Published var errorMessage: String?
+    @Published var forecast: [DayForecast] = []
     
     var onUpdate: (() -> Void)?
 
@@ -48,7 +49,7 @@ class WeatherViewModel: ObservableObject {
             return
         }
 
-        guard let url = URL(string: "https://api.open-meteo.com/v1/forecast?latitude=\(latitude)&longitude=\(longitude)&current_weather=true") else {
+        guard let url = URL(string: "https://api.open-meteo.com/v1/forecast?latitude=\(latitude)&longitude=\(longitude)&current_weather=true&daily=temperature_2m_max,temperature_2m_min&timezone=auto") else {
             errorMessage = "Invalid URL"
             return
         }
@@ -56,12 +57,25 @@ class WeatherViewModel: ObservableObject {
         do {
             let (data, _) = try await URLSession.shared.data(from: url)
             let decoder = JSONDecoder()
-            decoder.keyDecodingStrategy = .convertFromSnakeCase
+//            decoder.keyDecodingStrategy = .convertFromSnakeCase
             let decoded = try decoder.decode(WeatherResponse.self, from: data)
 
             temperature = decoded.currentWeather.temperature
             windspeed = decoded.currentWeather.windspeed
-        } catch _ as DecodingError {
+            
+            var days: [DayForecast] = []
+            for i in 0..<decoded.daily.time.count {
+                let day = DayForecast(
+                    date: decoded.daily.time[i],
+                    high: decoded.daily.temperature2mMax[i],
+                    low: decoded.daily.temperature2mMin[i]
+                )
+                days.append(day)
+            }
+            forecast = days
+            
+        } catch let error as DecodingError {
+//            print("Decoding failed: \(error)")
             errorMessage = "Couldn't understand the server's response"
         } catch let error as URLError {
             errorMessage = "Network error: \(error.localizedDescription)"
