@@ -26,6 +26,9 @@ struct WeatherView: View {
                     let formatedwind=String(format: "%.1f",wind)
                     Text("\(formatedtemp) °C").foregroundColor(.orange)
                     Text("\(formatedwind) km/h")
+                    List(viewModel.forecast) { day in
+                        Text("\(day.date): \(String(format: "%.1f", day.high))° / \(String(format: "%.1f", day.low))°")
+                    }
                 }
             } else {
                 ProgressView()
