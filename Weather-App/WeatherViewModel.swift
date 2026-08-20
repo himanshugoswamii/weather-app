@@ -14,12 +14,24 @@ class WeatherViewModel: ObservableObject {
     @Published var windspeed: Double?
     @Published var errorMessage: String?
     @Published var forecast: [DayForecast] = []
+    @Published var favoriteCities: [String] = []
     
     var onUpdate: (() -> Void)?
 
     func setupCallback() {
         onUpdate = { [weak self] in
             print("Temperature updated: \(self?.temperature ?? 0)")
+        }
+    }
+    
+    func loadFavorites() {
+        favoriteCities = UserDefaults.standard.stringArray(forKey: "favoriteCities") ?? []
+    }
+
+    func addFavorite(_ city: String) {
+        if !favoriteCities.contains(city) {
+            favoriteCities.append(city)
+            UserDefaults.standard.set(favoriteCities, forKey: "favoriteCities")
         }
     }
 

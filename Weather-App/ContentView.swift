@@ -7,6 +7,15 @@ struct WeatherView: View {
     
     var body: some View {
         VStack {
+            ForEach(viewModel.favoriteCities, id:\.self){ city in
+                Button(city){
+                    Task{
+                        await viewModel.loadWeather(for: city)
+                    }
+                }
+                
+            }
+                
             TextField("City", text: $cityName)
                 .multilineTextAlignment(.center)   // centers the text WITHIN the field
                     .frame(maxWidth: .infinity)         // makes the field span the available width
@@ -15,6 +24,10 @@ struct WeatherView: View {
                 Task {
                     await viewModel.loadWeather(for: cityName)
                 }
+            }
+            
+            Button("Save to Favourites"){
+                viewModel.addFavorite(cityName)
             }
             
             if let error = viewModel.errorMessage {
@@ -35,6 +48,7 @@ struct WeatherView: View {
             }
         }
         .task {
+            viewModel.loadFavorites()
             await viewModel.loadWeather(for: cityName)
         }
     }
